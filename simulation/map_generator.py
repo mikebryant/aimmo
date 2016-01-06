@@ -4,19 +4,20 @@ from itertools import tee, izip
 
 from simulation.direction import ALL_DIRECTIONS
 from simulation.location import Location
-from simulation.world_map import Cell, WorldMap
+from simulation.world_map import WorldMap, Grid
 
 
 def generate_map(height, width, obstacle_ratio):
-    grid = [[Cell(Location(x, y)) for y in xrange(height)] for x in xrange(width)]
+    grid = Grid(width, height)
     world_map = WorldMap(grid)
 
     # We designate one non-corner edge cell as empty, to ensure that the map can be expanded
-    always_empty_edge_x, always_empty_edge_y = get_random_edge_index(height, width)
+    always_empty_edge = Location(*get_random_edge_coordinate(height, width))
 
     for x, y in shuffled(_get_edge_coordinates(height, width)):
-        if (x, y) != (always_empty_edge_x, always_empty_edge_y) and random.random() < obstacle_ratio:
-            cell = grid[x][y]
+        loc = Location(x, y)
+        if loc != always_empty_edge and random.random() < obstacle_ratio:
+            cell = grid.get_cell(loc)
             cell.habitable = False
             #   So long as all habitable neighbours can still reach each other, then the map cannot get bisected
             if not _all_habitable_neighbours_can_reach_each_other(cell, world_map):
@@ -79,7 +80,7 @@ def get_shortest_path_between(source_cell, destination_cell, world_map):
     return None
 
 
-def get_random_edge_index(height, width, rng=random):
+def get_random_edge_coordinate(height, width, rng=random):
     assert height >= 2 and width >= 2
 
     num_row_cells = width - 2

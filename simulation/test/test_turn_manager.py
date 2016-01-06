@@ -2,6 +2,7 @@ import os
 import sys
 
 from simulation.avatar.avatar_manager import AvatarManager
+from simulation.world_map import WorldMap
 
 sys.path.append(os.path.abspath('.'))
 
@@ -9,7 +10,7 @@ import unittest
 
 from simulation.location import Location
 from simulation.turn_manager import TurnManager
-from simulation.test.maps import InfiniteMap
+from simulation.test.grids import HugeGrid
 from simulation.test.dummy_avatar import DummyAvatarRunner
 from simulation.avatar.avatar_appearance import AvatarAppearance
 from simulation.game_state import GameState
@@ -29,7 +30,7 @@ class TestTurnManager(unittest.TestCase):
 
     def construct_turn_manager(self, *avatars):
         self.avatar_manager = AvatarManager(avatars)
-        self.game_state = GameState(InfiniteMap(), self.avatar_manager)
+        self.game_state = GameState(WorldMap(HugeGrid()), self.avatar_manager)
         self.turn_manager = TurnManager(self.game_state)
 
     def test_run_turn(self):
